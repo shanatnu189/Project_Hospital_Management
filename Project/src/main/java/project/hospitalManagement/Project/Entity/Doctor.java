@@ -25,7 +25,7 @@ public class Doctor {
     @Column(length = 100)
     private String specialization;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column( unique = true, length = 100) //nullable = false, suggested and have to do it
     private String email;
 
     @ManyToMany(mappedBy = "doctors")
@@ -33,5 +33,9 @@ public class Doctor {
 
     @OneToMany(mappedBy = "doctor")
     private List<Appointment> appointments = new ArrayList<>();
+
+    @OneToOne
+    @MapsId
+    private User user;
 
 }

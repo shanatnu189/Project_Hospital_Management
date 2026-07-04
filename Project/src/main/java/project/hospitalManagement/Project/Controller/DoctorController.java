@@ -1,5 +1,7 @@
 package project.hospitalManagement.Project.Controller;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import project.hospitalManagement.Project.Entity.User;
 import project.hospitalManagement.Project.Service.AppointmentService;
 import project.hospitalManagement.Project.dto.AppointmentResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,10 @@ public class DoctorController {
 
     @GetMapping("/appointments")
     public ResponseEntity<List<AppointmentResponseDto>> getAllAppointmentsOfDoctor() {
-        return ResponseEntity.ok(appointmentService.getAllAppointmentsOfDoctor(1L));
+
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return ResponseEntity.ok(appointmentService.getAllAppointmentsOfDoctor(user.getId()));
     }
 
 }
