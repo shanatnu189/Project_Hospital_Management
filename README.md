@@ -98,42 +98,71 @@ Caching	Caffeine	3.2.1
 Mapping	ModelMapper	3.2.0
 Build	Maven	-
 Java	Java	24
-Architecture Layers
+
+📦 Database Schema
+Core Entities
+Entity	Description	Key Fields
+AppUser	Authentication and authorization	id, username, password, provider_type
+Patient	Patient profiles	user_id, name, email, blood_group
+Doctor	Medical professionals	user_id, name, specialization, email
+Appointment	Medical appointments	id, appointment_time, reason, doctor, patient
+Department	Medical departments	id, name, head_doctor
+Insurance	Patient insurance details	id, provider, policy_number
+Relationships
+Patient ↔ Appointment: One-to-Many
+
+Doctor ↔ Appointment: One-to-Many
+
+Patient ↔ User: One-to-One
+
+Doctor ↔ User: One-to-One
+
+Doctor ↔ Department: Many-to-Many
+
+🚀 Getting Started
+Prerequisites
+bash
+- Java 24 or higher
+- Maven 3.8+
+- PostgreSQL 18.3+
+- Git
+Installation
+Clone the repository
+
+bash
+git clone https://github.com/yourusername/hospital-management-system.git
+cd hospital-management-system
+Configure Database
+
+properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/HospitalDB
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+Build and Run
+
+bash
+mvn clean install
+mvn spring-boot:run
+Access the Application
+
 text
-┌─────────────────────────────────────────────────────────────┐
-│                    Presentation Layer                      │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │  REST API  │  │  Controllers│  │  Security  │          │
-│  │  Endpoints │  │   (CRUD)   │  │   Filters  │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
-├─────────────────────────────────────────────────────────────┤
-│                      Service Layer                         │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │ Appointment│  │  Patient   │  │   Doctor   │          │
-│  │  Service   │  │  Service   │  │   Service  │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │    Auth    │  │   Cache    │  │   Custom   │          │
-│  │   Service  │  │   Service  │  │   Details  │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
-├─────────────────────────────────────────────────────────────┤
-│                    Repository Layer                        │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │  Patient   │  │   Doctor   │  │Appointment │          │
-│  │Repository  │  │Repository  │  │Repository  │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
-├─────────────────────────────────────────────────────────────┤
-│                    Data Layer                              │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              PostgreSQL Database                    │   │
-│  │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐          │   │
-│  │  │Users │  │Patients│  │Doctors│  │Appointments │   │   │
-│  │  └──────┘  └──────┘  └──────┘  └──────┘          │   │
-│  └─────────────────────────────────────────────────────┘   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              Caffeine Cache Layer                   │   │
-│  │  ┌──────────────────────────────────────────┐       │   │
-│  │  │  In-Memory Cache for Frequently Used Data│       │   │
-│  │  └──────────────────────────────────────────┘       │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+Base URL: http://localhost:8080/api/v1
+📊 API Endpoints
+
+Authentication
+text
+POST   /auth/signup       - Register new user
+POST   /auth/login        - Login and get JWT token
+
+
+Patients
+text
+POST   /patients/appointments  - Book appointment
+GET    /patients/profile       - Get patient profile
+GET    /patients/appointments/{id} - Get appointment details
+
+
+Doctors
+text
+GET    /doctors/allDoctors     - Get all doctors
+GET    /doctors/appointments   - Get doctor's appointments
