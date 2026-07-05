@@ -8,5 +8,6 @@ public class OnBoardDoctorRequestDto {
     private Long userId;
     private String specialization;
     private String name;
+    private String email;
 
 }

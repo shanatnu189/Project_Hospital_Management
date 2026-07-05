@@ -1,14 +1,13 @@
 package project.hospitalManagement.Project.Controller;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import project.hospitalManagement.Project.Entity.User;
-import project.hospitalManagement.Project.Service.AppointmentService;
-import project.hospitalManagement.Project.dto.AppointmentResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import project.hospitalManagement.Project.Service.DoctorService;
+import project.hospitalManagement.Project.dto.DoctorResponseDto;
+import project.hospitalManagement.Project.dto.OnBoardDoctorRequestDto;
 
 import java.util.List;
 
@@ -17,14 +16,54 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DoctorController {
 
-    private final AppointmentService appointmentService;
+    private final DoctorService doctorService;
 
-    @GetMapping("/appointments")
-    public ResponseEntity<List<AppointmentResponseDto>> getAllAppointmentsOfDoctor() {
-
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return ResponseEntity.ok(appointmentService.getAllAppointmentsOfDoctor(user.getId()));
+    // Get all doctors
+    @GetMapping("/allDoctors")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    public ResponseEntity<List<DoctorResponseDto>> getAllDoctors() {
+        return ResponseEntity.ok(doctorService.getAllDoctors());
     }
 
+    // Get doctor by ID
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    public ResponseEntity<DoctorResponseDto> getDoctorById(@PathVariable Long id) {
+        return ResponseEntity.ok(doctorService.getDoctorById(id));
+    }
+
+    // Get doctor by user ID
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    public ResponseEntity<DoctorResponseDto> getDoctorByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(doctorService.getDoctorByUserId(userId));
+    }
+
+    // Onboard new doctor
+    @PostMapping("/onboard")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DoctorResponseDto> onBoardNewDoctor(@RequestBody OnBoardDoctorRequestDto request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(doctorService.onBoardNewDoctor(request));
+    }
+
+    // Update doctor
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DoctorResponseDto> updateDoctor(
+            @PathVariable Long id,
+            @RequestBody DoctorResponseDto doctorDto) {
+        return ResponseEntity.ok(doctorService.updateDoctor(id, doctorDto));
+    }
+
+    // Delete doctor
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteDoctor(
+            @PathVariable Long id,
+            @RequestParam Long userId,
+            @RequestParam String email) {
+        doctorService.deleteDoctor(id, userId, email);
+        return ResponseEntity.noContent().build();
+    }
 }
